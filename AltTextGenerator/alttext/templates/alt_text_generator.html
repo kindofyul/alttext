@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alt Text Generator</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Alt Text Generator</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="excel_file" style="display:inline">Excel File:</label>
+            {{ form.excel_file }}
+            <br>
+            <br>
+            <textarea class="styled-textarea" name="html_text" rows="10" cols="80" placeholder="Paste your HTML code here"></textarea>
+            <br>
+            <button type="submit" class="styled-button">시작하기</button>
+        </form>
+
+        {% if modified_html %}
+        <hr>
+        <h2>수정된 HTML 결과</h2>
+        <div>
+            <textarea id="modified-html" rows="15" cols="80" style="overflow:auto">{{ modified_html|escape }}</textarea>
+            <button id="copy-button">클립보드에 복사</button>
+            <p id="copy-message" style="color: green; display: none;">  복사 완료!</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 스크립트 추가 -->
+    <script>
+        const copyButton = document.getElementById('copy-button');
+        const modifiedHtmlTextarea = document.getElementById('modified-html');
+        const copyMessage = document.getElementById('copy-message');
+    
+        copyButton.addEventListener('click', async function () {
+            try {
+                await navigator.clipboard.writeText(modifiedHtmlTextarea.value);
+                copyMessage.style.display = 'block';
+                copyMessage.style.color = 'green';
+                setTimeout(function() {
+                    copyMessage.style.display = 'none';
+                }, 3000); // 3초 후에 메시지 감추기
+            } catch (err) {
+                console.error('클립보드 복사 실패:', err);
+            }
+        });
+    </script>
+</body>
+</html>
